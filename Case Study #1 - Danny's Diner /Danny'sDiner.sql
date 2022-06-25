@@ -208,3 +208,41 @@ FROM (
         WHERE s.order_date >= mem.join_date 
 	  ) sub
 GROUP BY sub.customer_id
+
+-- Bonus questions
+
+-- Question 1
+
+SELECT s.customer_id, 
+	     s.order_date,
+       menu.product_name,
+       menu.price,
+       CASE WHEN s.order_date >= m.join_date THEN 'Y'
+       ELSE 'N' END AS member
+FROM dannys_diner.sales s
+JOIN dannys_diner.menu menu
+ON s.product_id = menu.product_id
+LEFT JOIN dannys_diner.members m
+ON s.customer_id = m.customer_id
+ORDER BY s.customer_id, s.order_date
+
+-- Question 2
+
+SELECT sub.*,
+	     CASE WHEN sub.member = 'Y' THEN 
+       RANK () OVER (PARTITION BY sub.customer_id, sub.member ORDER BY 		  sub.order_date) 
+       ELSE NULL END AS ranking
+FROM (
+        SELECT s.customer_id, 
+               s.order_date,
+               menu.product_name,
+               menu.price,
+               CASE WHEN s.order_date >= m.join_date THEN 'Y'
+               ELSE 'N' END AS member
+        FROM dannys_diner.sales s
+        JOIN dannys_diner.menu menu
+        ON s.product_id = menu.product_id
+        LEFT JOIN dannys_diner.members m
+        ON s.customer_id = m.customer_id
+        ORDER BY s.customer_id, s.order_date
+  	 ) sub
