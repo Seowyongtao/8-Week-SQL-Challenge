@@ -143,7 +143,7 @@ FROM (
 	  ) sub 
 JOIN dannys_diner.menu m
 ON sub.product_id = m.product_id
-WHERE sub.row = 1
+WHERE sub.row = 1;
 
 
 -- Question 7: Which item was purchased just before the customer became a member?
@@ -174,7 +174,7 @@ JOIN dannys_diner.members m
 ON s.customer_id = m.customer_id
 JOIN dannys_diner.menu menu
 ON s.product_id = menu.product_id
-WHERE s.order_date < m.join_date 
+WHERE s.order_date < m.join_date;
 
 -- Question 9: If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 
@@ -188,7 +188,7 @@ FROM (
   	 ) sub
 JOIN dannys_diner.sales s
 ON sub.product_id = s.product_id
-GROUP BY s.customer_id
+GROUP BY s.customer_id;
 
 -- Question 10: In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
@@ -207,7 +207,7 @@ FROM (
         ON s.customer_id = mem.customer_id
         WHERE s.order_date >= mem.join_date 
 	  ) sub
-GROUP BY sub.customer_id
+GROUP BY sub.customer_id;
 
 -- Bonus questions
 
@@ -224,7 +224,7 @@ JOIN dannys_diner.menu menu
 ON s.product_id = menu.product_id
 LEFT JOIN dannys_diner.members m
 ON s.customer_id = m.customer_id
-ORDER BY s.customer_id, s.order_date
+ORDER BY s.customer_id, s.order_date;
 
 -- Question 2
 
@@ -245,4 +245,4 @@ FROM (
         LEFT JOIN dannys_diner.members m
         ON s.customer_id = m.customer_id
         ORDER BY s.customer_id, s.order_date
-  	 ) sub
+  	 ) sub;

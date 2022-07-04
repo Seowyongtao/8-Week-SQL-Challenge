@@ -141,18 +141,103 @@ GROUP BY c.customer_id;
 SELECT runner_id, 
 	   COUNT(CASE WHEN pickup_time = 'null' THEN NULL ELSE pickup_time END) AS number_of_succesful_orders
 FROM pizza_runner.runner_orders r
-GROUP BY r.runner_id
+GROUP BY r.runner_id;
 
 -- Question 4: How many of each type of pizza was delivered?
 
-SELECT o.pizza_id,
-	   COUNT(o.pizza_id) AS number_of_delivered
+SELECT p.pizza_name,
+	     COUNT(p.pizza_name) AS delivered_count
 FROM (
         SELECT order_id, 
-        CASE WHEN pickup_time = 'null' THEN NULL ELSE 'yes' END AS 	   	 delivered
+               CASE WHEN pickup_time = 'null' THEN NULL ELSE 'yes' END AS delivered
         FROM pizza_runner.runner_orders r
       ) sub
 JOIN pizza_runner.customer_orders AS o
 ON o.order_id = sub.order_id 
+JOIN pizza_runner.pizza_names AS p
+ON o.pizza_id = p.pizza_id
 AND sub.delivered IS NOT NULL
-GROUP BY o.pizza_id;
+GROUP BY p.pizza_name;
+
+-- Question 5: How many Vegetarian and Meatlovers were ordered by each customer?
+
+SELECT sub.customer_id,
+	   SUM(sub.Meat_Lover_ordered) as meatlover_ordered_count,
+       SUM(sub.Vegetarian_ordered) as vegetable_ordered_count
+FROM (
+        SELECT customer_id, 
+               CASE WHEN pizza_id = 1 THEN 1
+               ELSE 0 END AS Meat_Lover_ordered,
+               CASE WHEN pizza_id = 2 THEN 1
+               ELSE 0 END AS Vegetarian_ordered
+        FROM pizza_runner.customer_orders 
+  	 ) sub
+GROUP BY sub.customer_id
+ORDER BY sub.customer_id;
+
+-- Question 6: What was the maximum number of pizzas delivered in a single order?
+
+SELECT sub.order_id,
+	     COUNT(order_id) AS maximum_number_of_pizzas_delivered
+FROM (
+        SELECT c.order_id
+        FROM pizza_runner.customer_orders c
+        JOIN pizza_runner.runner_orders r
+        ON c.order_id = r.order_id
+        WHERE r.pickup_time != 'null'
+     ) sub
+GROUP BY sub.order_id;
+
+-- Question 7: For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+
+SELECT sub.customer_id, 
+	     SUM(CASE WHEN sub.new_exclusions IS NULL AND sub.new_extras IS NULL THEN 0
+       ELSE 1 END) AS at_least_1_change,
+       SUM(CASE WHEN sub.new_exclusions IS NULL AND sub.new_extras IS NULL THEN 1
+       ELSE 0 END) AS no_change
+FROM (
+        SELECT c.customer_id,
+               CASE WHEN exclusions = 'null' OR exclusions = '' THEN NULL
+               ELSE exclusions END AS new_exclusions,
+               CASE WHEN extras = 'null' OR extras = '' OR extras = 'NaN' THEN NULL 
+               ELSE extras END AS new_extras
+        FROM pizza_runner.customer_orders c
+        JOIN pizza_runner.runner_orders r 
+        ON c.order_id = r.order_id
+        WHERE r.pickup_time != 'null'
+ 	 ) sub
+GROUP BY sub.customer_id
+ORDER BY sub.customer_id;
+
+-- Question 8: How many pizzas were delivered that had both exclusions and extras?
+
+SELECT count(sub.*) AS number_of_pizzas_delivered_exclusions_extras
+FROM (
+        SELECT r.order_id, 
+               CASE WHEN exclusions = 'null' OR exclusions = '' THEN NULL
+               ELSE exclusions END AS new_exclusions,
+               CASE WHEN extras = 'null' OR extras = '' OR extras = 'NaN' THEN NULL 
+  			       ELSE extras END AS new_extras
+        FROM pizza_runner.customer_orders c
+        JOIN pizza_runner.runner_orders r
+        ON c.order_id = r.order_id
+        WHERE r.pickup_time != 'null'
+  	  ) sub
+WHERE (sub.new_exclusions IS NOT NULL AND sub.new_extras IS NOT NULL);
+
+-- Question 9: What was the total volume of pizzas ordered for each hour of the day?
+
+SELECT extract(HOUR from order_time) AS hour_of_the_day,
+	     COUNT(order_id) AS volume_of_pizzas_ordered
+FROM pizza_runner.customer_orders
+GROUP BY extract(HOUR from order_time)
+ORDER BY extract(HOUR from order_time);
+
+-- Question 10: What was the volume of orders for each day of the week?
+
+SELECT extract(dow from order_time) AS day_of_the_week,
+	   COUNT(order_id) AS volume_of_orders
+FROM pizza_runner.customer_orders
+GROUP BY extract(dow from order_time)
+ORDER BY extract(dow from order_time);
+
