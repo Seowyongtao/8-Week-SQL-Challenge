@@ -49,3 +49,37 @@ JOIN (
 ON sub.order_id = sub2.order_id
 GROUP BY number_of_pizzas
 
+-- Question 4: What was the average distance travelled for each customer?
+
+SELECT sub1.customer_id, 
+	   AVG(sub2.new_distance) AS average_distance
+FROM (
+      SELECT DISTINCT order_id, customer_id
+      FROM pizza_runner.customer_orders
+     ) sub1
+JOIN (
+      SELECT order_id, 
+             CAST(CASE WHEN distance LIKE '%km' THEN TRIM('km' from distance)
+             ELSE distance END AS FLOAT )AS new_distance
+      FROM pizza_runner.runner_orders
+      WHERE distance != 'null'
+	   ) sub2
+ON sub1.order_id = sub2.order_id
+GROUP BY sub1.customer_id
+ORDER BY sub1.customer_id
+
+-- Question 5: What was the difference between the longest and shortest delivery times for all orders?
+
+SELECT MAX(sub.new_duration) - MIN(sub.new_duration) AS 					   dilivery_times_different
+FROM (
+      SELECT order_id,
+             CAST(CASE WHEN duration LIKE '%minutes' 
+             THEN TRIM ('minutes' from duration)
+             WHEN duration LIKE '%mins'
+             THEN TRIM ('mins' from duration) 
+             WHEN duration LIKE '%minute'
+             THEN TRIM ('minute' from duration)
+             ELSE duration END AS INT) AS new_duration
+      FROM pizza_runner.runner_orders
+      WHERE distance != 'null'
+     ) sub
