@@ -83,3 +83,45 @@ FROM (
       FROM pizza_runner.runner_orders
       WHERE distance != 'null'
      ) sub
+
+-- Question 6: What was the average speed for each runner for each delivery and do you notice any trend for these values?
+
+SELECT sub.order_id,
+	 sub.runner_id,
+       sub.new_distance/sub.new_duration_in_hour AS speed
+FROM (
+      SELECT order_id,
+            runner_id,
+            CAST(CASE WHEN distance LIKE '%km' THEN TRIM('km' from 				   distance)
+            ELSE distance END AS FLOAT )AS new_distance,
+            (CAST(CASE WHEN duration LIKE '%minutes' 
+            THEN TRIM ('minutes' from duration)
+            WHEN duration LIKE '%mins'
+            THEN TRIM ('mins' from duration) 
+            WHEN duration LIKE '%minute'
+            THEN TRIM ('minute' from duration)
+            ELSE duration END AS FLOAT)/60) AS new_duration_in_hour
+      FROM pizza_runner.runner_orders
+      WHERE distance != 'null'
+	) sub
+ORDER BY sub.runner_id
+
+-- Question 7: What is the successful delivery percentage for each runner?
+
+SELECT sub.runner_id,	
+	 (CAST(sub2.successful_delivery_count AS FLOAT)/CAST(sub.delivery_count AS FLOAT))*100 AS successful_delivery_percentage
+FROM (
+        SELECT runner_id, 
+               COUNT(runner_id) AS delivery_count
+        FROM pizza_runner.runner_orders
+        GROUP BY runner_id
+      ) sub
+JOIN (
+        SELECT runner_id, 
+               COUNT(runner_id) AS successful_delivery_count
+        FROM pizza_runner.runner_orders
+        WHERE pickup_time != 'null'
+        GROUP BY runner_id
+     ) sub2
+ON sub.runner_id = sub2.runner_id
+ORDER BY runner_id
