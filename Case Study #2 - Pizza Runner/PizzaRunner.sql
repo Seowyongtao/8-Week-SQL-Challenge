@@ -132,14 +132,14 @@ FROM pizza_runner.customer_orders;
 -- Question 2: How many unique customer orders were made?
 
 SELECT customer_id, 
-	   COUNT(order_id) AS number_of_pizzas_ordered
+	     COUNT(order_id) AS number_of_pizzas_ordered
 FROM pizza_runner.customer_orders c
 GROUP BY c.customer_id;
 
 -- Question 3: How many successful orders were delivered by each runner?
 
 SELECT runner_id, 
-	   COUNT(CASE WHEN pickup_time = 'null' THEN NULL ELSE pickup_time END) AS number_of_succesful_orders
+	     COUNT(CASE WHEN pickup_time = 'null' THEN NULL ELSE pickup_time END) AS number_of_succesful_orders
 FROM pizza_runner.runner_orders r
 GROUP BY r.runner_id;
 
@@ -162,7 +162,7 @@ GROUP BY p.pizza_name;
 -- Question 5: How many Vegetarian and Meatlovers were ordered by each customer?
 
 SELECT sub.customer_id,
-	   SUM(sub.Meat_Lover_ordered) as meatlover_ordered_count,
+	     SUM(sub.Meat_Lover_ordered) as meatlover_ordered_count,
        SUM(sub.Vegetarian_ordered) as vegetable_ordered_count
 FROM (
         SELECT customer_id, 
@@ -236,7 +236,7 @@ ORDER BY extract(HOUR from order_time);
 -- Question 10: What was the volume of orders for each day of the week?
 
 SELECT extract(dow from order_time) AS day_of_the_week,
-	   COUNT(order_id) AS volume_of_orders
+	     COUNT(order_id) AS volume_of_orders
 FROM pizza_runner.customer_orders
 GROUP BY extract(dow from order_time)
 ORDER BY extract(dow from order_time);

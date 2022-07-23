@@ -7,7 +7,7 @@
 -- Question 1: How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)
 
 SELECT to_char(registration_date, 'W') AS registration_week,
-	   COUNT(registration_date) AS number_of_runner_signedup
+	 COUNT(registration_date) AS number_of_runner_signedup
 FROM pizza_runner.runners
 GROUP BY to_char(registration_date, 'W')
 ORDER BY to_char(registration_date, 'W') ASC;
@@ -15,7 +15,7 @@ ORDER BY to_char(registration_date, 'W') ASC;
 -- Question 2: What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?
 
 SELECT sub.runner_id,
-	   AVG(sub.time_different) AS average_time_taken_minutes
+	 AVG(sub.time_different) AS average_time_taken_minutes
 FROM (
         SELECT distinct
   			r.runner_id,
@@ -30,7 +30,7 @@ GROUP BY sub.runner_id;
 -- Question 3: Is there any relationship between the number of pizzas and how long the order takes to prepare?
 
 SELECT number_of_pizzas,
-	   AVG(time_taken) AS average_prepare_time_mins
+	 AVG(time_taken) AS average_prepare_time_mins
 FROM (
       SELECT order_id, 
              count(order_id) AS number_of_pizzas
@@ -52,7 +52,7 @@ GROUP BY number_of_pizzas
 -- Question 4: What was the average distance travelled for each customer?
 
 SELECT sub1.customer_id, 
-	   AVG(sub2.new_distance) AS average_distance
+	 AVG(sub2.new_distance) AS average_distance
 FROM (
       SELECT DISTINCT order_id, customer_id
       FROM pizza_runner.customer_orders
