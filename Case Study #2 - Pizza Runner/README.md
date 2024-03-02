@@ -111,7 +111,7 @@ ORDER BY customer_id, pizza_name
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH PizzaOrderCounts AS (
 
   SELECT order_id,
          COUNT(*) AS number_of_pizzas_ordered
@@ -122,7 +122,7 @@ WITH CTE AS (
 )
 
 SELECT MAX(number_of_pizzas_ordered) as maximun_number_of_pizzas_order 
-FROM CTE
+FROM PizzaOrderCounts
 ```
 
 #### Answer:
@@ -137,7 +137,7 @@ FROM CTE
 #### Solution: 
 
 ```sql
-WITH cleaned_table AS (
+WITH CleanedCustomerOrders AS (
 
   SELECT customer_orders.order_id,
          customer_orders.customer_id, 
@@ -172,7 +172,7 @@ SELECT customer_id,
           ELSE 0 
         END
        ) AS no_changes
-FROM cleaned_table
+FROM CleanedCustomerOrders
 GROUP BY customer_id
 ORDER BY customer_id
 ```
@@ -192,7 +192,7 @@ ORDER BY customer_id
 #### Solution: 
 
 ```sql
-WITH cleaned_table AS (
+WITH CleanedCustomerOrders AS (
 
   SELECT customer_orders.order_id,
          customer_orders.customer_id, 
@@ -215,7 +215,7 @@ WITH cleaned_table AS (
 )
 
 SELECT COUNT(*) AS number_of_pizzas_delivered_that_has_both_exclusions_and_extras
-FROM cleaned_table
+FROM CleanedCustomerOrders
 WHERE (exclusions IS NOT NULL AND extras IS NOT NULL)
 ```
 
@@ -295,7 +295,7 @@ ORDER BY DATE_TRUNC('week', registration_date)::DATE + 4
 #### Solution: 
 
 ```sql
-WITH cleaned_joined_table AS (
+WITH CleanedJoinedOrders AS (
 
   SELECT DISTINCT customer_orders.order_id, 
                   runner_id,
@@ -311,7 +311,7 @@ WITH cleaned_joined_table AS (
 
 SELECT runner_id,
        ROUND(AVG(time_difference_minutes), 2) average_minutes
-FROM cleaned_joined_table
+FROM CleanedJoinedOrders
 GROUP BY runner_id
 ORDER BY runner_id
 ```
@@ -329,7 +329,7 @@ ORDER BY runner_id
 #### Solution: 
 
 ```sql
-WITH time_taken_for_every_orderid AS (
+WITH OrderPreparationTime AS (
 
   SELECT DISTINCT customer_orders.order_id, 
                   order_time, 
@@ -344,7 +344,7 @@ WITH time_taken_for_every_orderid AS (
 
 ),
 
-number_of_pizza_for_every_orderID AS (
+NumberOfPizzasPerOrder AS (
 
 SELECT order_id,
        COUNT(*) AS number_of_pizzas
@@ -355,8 +355,8 @@ GROUP BY order_id
 
 SELECT number_of_pizzas,
        ROUND(AVG(time_taken_to_prepare_in_minutes), 2 ) AS average_time_taken_to_prepare_in_minutes
-FROM time_taken_for_every_orderid a
-INNER JOIN number_of_pizza_for_every_orderID b
+FROM OrderPreparationTime a
+INNER JOIN NumberOfPizzasPerOrder b
 ON a.order_id = b.order_id
 GROUP BY number_of_pizzas
 ```
@@ -376,7 +376,7 @@ Yes, when the number of pizzas prepared increased, the average time taken to pre
 #### Solution: 
 
 ```sql
-WITH cleaned_customer_order_distance AS (
+WITH CleanedCustomerOrderDistances AS (
 
   SELECT DISTINCT runner_orders.order_id,
                   customer_id, 
@@ -390,7 +390,7 @@ WITH cleaned_customer_order_distance AS (
 
 SELECT customer_id,
        ROUND(AVG(distance), 2) AS average_distance
-FROM cleaned_customer_order_distance
+FROM CleanedCustomerOrderDistances
 GROUP BY customer_id
 ORDER BY customer_id
 ```
@@ -410,7 +410,7 @@ ORDER BY customer_id
 #### Solution: 
 
 ```sql
-WITH cleaned_runner_order_duration AS (
+WITH CleanedRunnerOrderDurations AS (
 
   SELECT order_id,
          UNNEST(REGEXP_MATCH(duration, '(^[0-9,.]+)'))::NUMERIC AS delivery_times
@@ -422,7 +422,7 @@ WITH cleaned_runner_order_duration AS (
 SELECT MAX(delivery_times) AS longest_delivery_times,
        MIN (delivery_times) AS shortest_delivery_times,
        ( MAX(delivery_times) - MIN(delivery_times) ) AS difference
-FROM cleaned_runner_order_duration
+FROM CleanedRunnerOrderDurations
 ```
 
 #### Answer:
@@ -436,7 +436,7 @@ FROM cleaned_runner_order_duration
 #### Solution: 
 
 ```sql
-WITH cleaned_runner_orders AS (
+WITH CleanedRunnerOrderData AS (
 
 SELECT runner_id, 
        UNNEST(REGEXP_MATCH(distance, '(^[0-9,.]+)'))::NUMERIC AS distance,
@@ -450,7 +450,7 @@ WHERE pickup_time != 'null'
 
 SELECT runner_id, 
        ROUND( AVG(speed), 2) AS average_speed
-FROM cleaned_runner_orders
+FROM CleanedRunnerOrderData
 GROUP BY runner_id
 ```
 
@@ -491,7 +491,7 @@ ORDER BY runner_id
 #### Solution: 
 
 ```sql
-WITH cleaned_pizza_recipes AS (
+WITH CleanedPizzaRecipes AS (
 
   SELECT pizza_recipes.pizza_id,
          pizza_names.pizza_name,
@@ -505,9 +505,9 @@ WITH cleaned_pizza_recipes AS (
 SELECT pizza_id,
        pizza_name,
        STRING_AGG(pizza_toppings.topping_name::TEXT, ', ') AS toppings
-FROM cleaned_pizza_recipes
+FROM CleanedPizzaRecipes
 INNER JOIN pizza_runner.pizza_toppings
-ON cleaned_pizza_recipes.topping_id = pizza_toppings.topping_id
+ON CleanedPizzaRecipes.topping_id = pizza_toppings.topping_id
 GROUP BY pizza_id, pizza_name
 ORDER BY pizza_id
 ```
@@ -525,7 +525,7 @@ ORDER BY pizza_id
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH ExtractedToppingIDs AS (
 
   SELECT REGEXP_SPLIT_TO_TABLE(extras, '[,\s]+')::INTEGER AS topping_id
   FROM pizza_runner.customer_orders
@@ -535,9 +535,9 @@ WITH CTE AS (
 )
 
 SELECT topping_name AS most_commonly_added_extras
-FROM CTE 
+FROM ExtractedToppingIDs 
 INNER JOIN pizza_runner.pizza_toppings
-ON CTE.topping_id = pizza_toppings.topping_id
+ON ExtractedToppingIDs.topping_id = pizza_toppings.topping_id
 GROUP BY topping_name
 ORDER BY COUNT(*) DESC
 LIMIT 1
@@ -554,7 +554,7 @@ LIMIT 1
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH ExtractedToppingIDs AS (
 
   SELECT REGEXP_SPLIT_TO_TABLE(exclusions, '[,\s]+')::INTEGER AS topping_id
   FROM pizza_runner.customer_orders
@@ -564,9 +564,9 @@ WITH CTE AS (
 )
 
 SELECT topping_name AS most_commonly_exclusion
-FROM CTE 
+FROM ExtractedToppingIDs 
 INNER JOIN pizza_runner.pizza_toppings
-ON CTE.topping_id = pizza_toppings.topping_id
+ON ExtractedToppingIDs.topping_id = pizza_toppings.topping_id
 GROUP BY topping_name
 ORDER BY COUNT(*) DESC
 LIMIT 1
@@ -588,7 +588,7 @@ LIMIT 1
 #### Solution: 
 
 ```sql
-WITH CTE1 AS (
+WITH CustomerOrderPreparation AS (
 
   SELECT order_id,
          customer_id,
@@ -607,7 +607,7 @@ WITH CTE1 AS (
 
 ),
 
-CTE2 AS (
+ExtractedToppingIDs AS (
 
   SELECT order_id,
          customer_id,
@@ -616,7 +616,7 @@ CTE2 AS (
          REGEXP_SPLIT_TO_TABLE(extras, '[,\s]+')::INTEGER AS extras_topping_id,
          order_time,
          original_row_number
-    FROM CTE1
+    FROM CustomerOrderPreparation
     
   UNION
   
@@ -627,12 +627,12 @@ CTE2 AS (
            NULL AS extras_topping_id,
            order_time,
            original_row_number
-    FROM CTE1
+    FROM CustomerOrderPreparation
     WHERE exclusions IS NULL AND extras IS NULL
     
 ),
 
-CTE3 AS (
+ToppingNameAggregation AS (
 
   SELECT a.order_id,
        a.customer_id,
@@ -642,7 +642,7 @@ CTE3 AS (
        a.original_row_number,
        STRING_AGG(c.topping_name, ', ') AS exclusions,
        STRING_AGG(d.topping_name, ', ') AS extras
-  FROM CTE2 a
+  FROM ExtractedToppingIDs a
   INNER JOIN pizza_runner.pizza_names b
     ON a.pizza_id = b.pizza_id
   LEFT JOIN pizza_runner.pizza_toppings c
@@ -659,7 +659,7 @@ CTE3 AS (
 
 ),
 
-CTE4 AS (
+FormattedOrderData AS (
 
   SELECT order_id,
          customer_id,
@@ -669,7 +669,7 @@ CTE4 AS (
          pizza_name,
          CASE WHEN exclusions IS NULL THEN '' ELSE ' - Exclude ' || exclusions END AS exclusions,
          CASE WHEN extras IS NULL THEN '' ELSE ' - Extra ' || exclusions END AS extras
-  FROM CTE3
+  FROM ToppingNameAggregation
   
 )
 
@@ -678,7 +678,7 @@ SELECT order_id,
        pizza_id,
        order_time,
        pizza_name || exclusions || extras AS order_item
-  FROM CTE4
+  FROM FormattedOrderData
 ```
 
 #### Answer:
@@ -706,7 +706,7 @@ SELECT order_id,
 
 #### Solution: 
 ```
-working in progress
+work in progress
 ```
 
 
@@ -719,7 +719,7 @@ working in progress
 
 #### Solution: 
 ```
-working in progress
+work in progress
 ```
 
 #### Answer:
@@ -814,7 +814,7 @@ FROM CTE
 #### Solution: 
 
 ```sql
-WITH delivery_cost AS (
+WITH DeliveryCost AS (
 
   SELECT UNNEST(REGEXP_MATCH(distance, '(^[0-9,.]+)'))::NUMERIC * 0.3 AS delivery_cost
   FROM pizza_runner.runner_orders
@@ -822,14 +822,14 @@ WITH delivery_cost AS (
   
 ), 
 
-total_delivery_cost AS (
+TotalDeliveryCost AS (
 
   SELECT SUM(delivery_cost) AS total_delivery_cost
-  FROM delivery_cost
+  FROM DeliveryCost
 
 ),
 
-total_sales AS (
+TotalSales AS (
 
   SELECT SUM ( 
           CASE 
@@ -846,21 +846,21 @@ total_sales AS (
 
 ),
 
-union_table AS (
+UnionTable AS (
 
   SELECT sales AS amount
-  FROM total_sales
+  FROM TotalSales
   
   UNION ALL 
   
   SELECT - (total_delivery_cost) AS amount
-  FROM total_delivery_cost
+  FROM TotalDeliveryCost
 
 )
 
 
 SELECT SUM(amount) AS total_money_left
-FROM union_table
+FROM UnionTable
 ```
 
 #### Answer:
