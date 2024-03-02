@@ -7,7 +7,8 @@
 #### Solution: 
 
 ```sql
-SELECT customer_id, SUM(price) as total_amount_spent
+SELECT customer_id, 
+	   SUM(price) as total_amount_spent
 FROM dannys_diner.sales a
 JOIN dannys_diner.menu b
 ON a.product_id = b.product_id
@@ -29,7 +30,7 @@ ORDER BY a.customer_id
 
 ```sql
 SELECT customer_id, 
-       COUNT(DISTINCT order_date)
+       COUNT(DISTINCT order_date) AS number_of_days
 FROM dannys_diner.sales
 GROUP BY customer_id
 ```
@@ -47,7 +48,7 @@ GROUP BY customer_id
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH EarliestOrderDates AS (
 
   SELECT customer_id, 
          MIN(order_date) AS min_order_date
@@ -60,7 +61,7 @@ SELECT a.customer_id,
        b.min_order_date, 
        product_name
 FROM dannys_diner.sales a
-INNER JOIN CTE b
+INNER JOIN EarliestOrderDates b
 ON a.customer_id = b.customer_id
 INNER JOIN dannys_diner.menu c
 ON a.product_id = c.product_id
@@ -82,25 +83,14 @@ ORDER BY customer_id
 #### Solution: 
 
 ```sql
-WITH CTE AS (
-
-  SELECT customer_id, 
-         MIN(order_date) AS min_order_date
-  FROM dannys_diner.sales 
-  GROUP BY customer_id
-
-)
-
-SELECT a.customer_id, 
-       b.min_order_date, 
-       product_name
-FROM dannys_diner.sales a
-INNER JOIN CTE b
-ON a.customer_id = b.customer_id
-INNER JOIN dannys_diner.menu c
-ON a.product_id = c.product_id
-WHERE a.order_date = b.min_order_date
-ORDER BY customer_id
+SELECT menu.product_id, 
+       menu.product_name,
+       COUNT(*) AS number_of_purchased
+FROM dannys_diner.sales 
+INNER JOIN dannys_diner.menu
+ON sales.product_id = menu.product_id
+GROUP BY menu.product_id, menu.product_name
+ORDER BY number_of_purchased DESC
 ```
 #### Answer:
 | product_id | product_name | number_of_purchases |
@@ -115,7 +105,7 @@ ORDER BY customer_id
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH CustomerProductPurchaseRank_CTE AS (
 
   SELECT a.customer_id,
          b.product_id,
@@ -130,7 +120,7 @@ WITH CTE AS (
 )
 
 SELECT customer_id, product_name, number_of_purchases
-FROM CTE
+FROM CustomerProductPurchaseRank_CTE
 WHERE item_rank = 1
 ```
 #### Answer:
@@ -219,7 +209,7 @@ SELECT customer_id,
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH PreJoinPurchases AS (
 
   SELECT a.customer_id, 
          a.order_date, 
@@ -238,7 +228,7 @@ WITH CTE AS (
 SELECT customer_id, 
        COUNT(*) AS total_items_purchased,
        SUM(price) AS total_amount_spent
-FROM CTE
+FROM PreJoinPurchases
 GROUP BY customer_id
 ORDER BY customer_id
 ```
@@ -254,7 +244,7 @@ ORDER BY customer_id
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH PointsCalculation AS (
 
   SELECT a.customer_id,
          b.product_name,
@@ -275,7 +265,7 @@ WITH CTE AS (
 
 SELECT customer_id,
        SUM(points_gained) AS total_points_gained
-FROM CTE
+FROM PointsCalculation 
 GROUP BY customer_id
 ORDER BY customer_id
 ```
@@ -292,7 +282,7 @@ ORDER BY customer_id
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH PointsCalculationWithMembership AS (
 
   SELECT a.customer_id,
          b.product_name,
@@ -320,7 +310,7 @@ WITH CTE AS (
 
 SELECT customer_id,
        SUM(points_gained) AS total_points_gained
-FROM CTE
+FROM PointsCalculationWithMembership
 GROUP BY customer_id
 ORDER BY customer_id
 ```
@@ -376,7 +366,7 @@ ORDER BY a.customer_id, a.order_date
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH SalesWithMembership AS (
 
   SELECT a.customer_id,
          a.order_date,
@@ -400,7 +390,7 @@ SELECT *,
           WHEN member = 'N' THEN NULL
           ELSE RANK() OVER (PARTITION BY customer_id, member ORDER BY order_date)  
         END ) AS ranking
-FROM CTE
+FROM SalesWithMembership
 ```
 #### Answer:
 | customer_id | order_date | product_name | price | member | ranking |
