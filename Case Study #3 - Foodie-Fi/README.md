@@ -144,7 +144,7 @@ FROM foodie_fi.subscriptions
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH TrialSubscriptionsBeginningOfMonth AS (
 
   SELECT customer_id,
          plan_name,
@@ -158,7 +158,7 @@ WITH CTE AS (
 
 SELECT beginning_of_the_month,
        COUNT(*)
-FROM CTE 
+FROM TrialSubscriptionsBeginningOfMonth
 GROUP BY beginning_of_the_month
 ORDER BY beginning_of_the_month
 ```
@@ -185,7 +185,7 @@ ORDER BY beginning_of_the_month
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH SubscriptionStartMonthWithPlanInfo AS (
 
   SELECT DATE_TRUNC('MONTH', start_date)::DATE AS beginning_of_the_month,
          subscriptions.plan_id,
@@ -200,7 +200,7 @@ WITH CTE AS (
 SELECT plan_id,
        plan_name,
        COUNT(*) AS event_count
-FROM CTE 
+FROM SubscriptionStartMonthWithPlanInfo 
 GROUP BY plan_id, plan_name
 ORDER BY plan_id
 ```
@@ -241,7 +241,7 @@ ON subscriptions.plan_id = plans.plan_id
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH SubscriptionWithPreviousPlan AS (
 
   SELECT customer_id,
          plan_name,
@@ -258,7 +258,7 @@ SELECT SUM ( CASE WHEN (plan_name = 'churn' AND previous_plan_name = 'trial') TH
         COUNT(DISTINCT customer_id)::numeric, 
         1
        ) AS percentage
-FROM CTE 
+FROM SubscriptionWithPreviousPlan
 ```
 
 #### Answer:
@@ -272,7 +272,7 @@ FROM CTE
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH SubscriptionWithPreviousPlan AS (
 
   SELECT customer_id,
          subscriptions.plan_id,
@@ -290,7 +290,7 @@ SELECT plan_id,
        ROUND(
         100 * COUNT(*) / SUM(COUNT(*)) OVER ()
        ) AS percentage
-FROM CTE 
+FROM SubscriptionWithPreviousPlan 
 WHERE previous_plan_name = 'trial'
 GROUP BY plan_name, plan_id
 ORDER BY plan_id
@@ -310,7 +310,7 @@ ORDER BY plan_id
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH FilteredRankedSubscriptions AS (
 
   SELECT customer_id,
          subscriptions.plan_id,
@@ -332,7 +332,7 @@ SELECT plan_id,
         SUM(COUNT(DISTINCT customer_id)) OVER () ),
         1
        ) AS percentage
-  FROM CTE
+  FROM FilteredRankedSubscriptions
   WHERE start_date_rank = 1 
   GROUP BY plan_id, plan_name
 ```
@@ -370,7 +370,7 @@ AND start_date <= '2020-12-31'
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH CustomerSubscriptionsWithJoinDate AS (
 
   SELECT customer_id, 
          plan_id,
@@ -388,19 +388,19 @@ WITH CTE AS (
 
 ),
 
-CTE2 AS (
+CustomerUpgradeToAnnualPlan AS (
 
   SELECT customer_id,
          start_date AS upgraded_to_annual_date,
          join_date,
          (start_date - join_date) :: numeric AS day_taken
-  FROM CTE 
+  FROM CustomerSubscriptionsWithJoinDate 
   WHERE plan_id = 3
 
 )
 
 SELECT ROUND( AVG(day_taken) ) AS average_days_taken
-FROM CTE2
+FROM CustomerUpgradeToAnnualPlan
 ```
 
 #### Answer:
@@ -481,7 +481,7 @@ ORDER BY bucket_width
 #### Solution: 
 
 ```sql
-WITH CTE AS (
+WITH FilteredSubscriptionWithPreviousPlan AS (
 
   SELECT customer_id,
          plan_name,
@@ -494,7 +494,7 @@ WITH CTE AS (
 )
 
 SELECT COUNT(DISTINCT customer_id) AS number_of_customers
-FROM CTE 
+FROM FilteredSubscriptionWithPreviousPlan 
 WHERE plan_name = 'basic monthly'
 AND previous_plan_name = 'pro monthly'
 ```
@@ -725,4 +725,3 @@ WINDOW w AS (
   ORDER BY start_date
 )
 ORDER BY customer_id, payment_date
-```
