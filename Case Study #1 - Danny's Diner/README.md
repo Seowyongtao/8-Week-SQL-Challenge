@@ -23,7 +23,7 @@ Danny has provided you with a sample of his overall customer data due to privacy
 
 ### Entity Relationship Diagram: 
 
-<img alt="Case Study 1" src="https://user-images.githubusercontent.com/81607668/127271130-dca9aedd-4ca9-4ed8-b6ec-1e1920dca4a8.png" width="100%" />
+<img alt="Case Study 1" src="https://user-images.githubusercontent.com/81607668/127271130-dca9aedd-4ca9-4ed8-b6ec-1e1920dca4a8.png" width="60%" />
 
 Full details for this case study: https://8weeksqlchallenge.com/case-study-1/
 
