@@ -1,12 +1,12 @@
 ﻿# Case Study #1 - Danny's Dinner 
 
-<img alt="Case Study 1" src="https://8weeksqlchallenge.com/images/case-study-designs/1.png" width="100%" />
+<img alt="Case Study 1" src="https://8weeksqlchallenge.com/images/case-study-designs/1.png" width="60%" height="60%" />
 
 ## 📚 Table of Contents
-[Introduction](#introduction)
-[Problem Statment](#problem-statement)
-[Entity Relationship Diagram](#entity-relationship-diagram)
-[Questions And Solution](#questions-and-solutions)
+- [Introduction](#introduction)
+- [Problem Statement](#problem-statement)
+- [Entity Relationship Diagram](#entity-relationship-diagram)
+- [Questions And Solutions](#questions-and-solutions)
 
 ## Introduction
 Danny seriously loves Japanese food so in the beginning of 2021, he decides to embark upon a risky venture and opens up a cute little restaurant that sells his 3 favourite foods: sushi, curry and ramen.
