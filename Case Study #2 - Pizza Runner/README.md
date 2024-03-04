@@ -5,10 +5,10 @@
 ## 📚 Table of Contents
 - [Introduction](#introduction)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
-- [A. Pizza Metrics](#a.-pizza-metrics)
-- [B. Runner and Customer Experience](#b.-runner-and-customer-experience)
-- [C. Ingredient Optimization](#c.-ingredient-optimization)
-- [D. Pricing and Ratings](#d.-pricing-and-ratings)
+- [A. Pizza Metrics](https://github.com/Seowyongtao/8-Week-SQL-Challenge/blob/main/Case%20Study%20%232%20-%20Pizza%20Runner/README.md#a-pizza-metrics)
+- [B. Runner and Customer Experience](https://github.com/Seowyongtao/8-Week-SQL-Challenge/blob/main/Case%20Study%20%232%20-%20Pizza%20Runner/README.md#b-runner-and-customer-experience)
+- [C. Ingredient Optimization](https://github.com/Seowyongtao/8-Week-SQL-Challenge/blob/main/Case%20Study%20%232%20-%20Pizza%20Runner/README.md#c-ingredient-optimization)
+- [D. Pricing and Ratings](https://github.com/Seowyongtao/8-Week-SQL-Challenge/blob/main/Case%20Study%20%232%20-%20Pizza%20Runner/README.md#d-pricing-and-ratings)
 
 ## Introduction
 Did you know that over  **115 million kilograms**  of pizza is consumed daily worldwide??? (Well according to Wikipedia anyway…)
