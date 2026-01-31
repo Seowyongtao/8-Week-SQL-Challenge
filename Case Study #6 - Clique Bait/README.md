@@ -3,6 +3,11 @@
 <img alt="Case Study 6" src="https://8weeksqlchallenge.com/images/case-study-designs/6.png" width="60%" height="60%" />
 
 ## 📚 Table of Contents
+- [Introduction](#introduction)
+- [Entity Relationship Diagram](#entity-relationship-diagram)
+- [A. Enterprise Relationship Diagram](#a-enterprise-relationship-diagram)
+- [B. Digital Analysis](#b-digital-analysis)
+- [C. Product Funnel Analysis](#c-product-funnel-analysis)
 
 ## Introduction 
 
