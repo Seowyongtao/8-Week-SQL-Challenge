@@ -16,6 +16,8 @@ In particular - the composition and rankings for different interests are provide
 
 Danny has asked for your assistance to analyse aggregated metrics for an example client and provide some high level insights about the customer list and their interests.
 
+Full details for this case study: https://8weeksqlchallenge.com/case-study-8/
+
 ## A. Data Exploration and Cleansing
 
 #### Question 1: Update the fresh_segments.interest_metrics table by modifying the month_year column to be a date data type with the start of the month
